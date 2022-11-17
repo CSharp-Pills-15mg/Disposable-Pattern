@@ -42,7 +42,7 @@ internal class MyBusiness
 
 And this is how it is safely used:
 
-```
+```csharp
 internal static void Main()
 {
     while (true)
