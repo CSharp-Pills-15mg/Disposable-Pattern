@@ -2,7 +2,7 @@
 
 When our class is inherited, that inheritor may also need to manually release some memory and/or dispose some member. It cannot create a new `Dispose()` method, so we must provide a way to hook up to our disposable mechanism.
 
-But first, let's remember how the current implementation of the class look like.
+But first, let's remember how the current implementation of the class looks like.
 
 ## From the previous session
 
@@ -65,7 +65,6 @@ internal static void Main()
     while (true)
     {
         using MyBusiness myBusiness = new();
-        
         myBusiness.DoSomeWork();
         
         DoSomethingElse();

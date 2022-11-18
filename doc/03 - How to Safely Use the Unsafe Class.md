@@ -9,7 +9,7 @@ In this session we will discuss what the consumer of our class may do to prevent
 
 > **Note**
 >
-> There are things that we can do in the initial class to prevent an unsafe usage, but that will be discussed in a future session.
+> There are things that we can do in the initial class itself to prevent an unsafe usage, but that will be discussed in a future session.
 
 ## Issue 1 - Forget to call `Close()`
 
@@ -33,7 +33,7 @@ internal static void Main()
     while (true)
     {
         MyBusiness myBusiness = new();
-        myBusiness.DoSomething();
+        myBusiness.DoSomeWork();
         
         DoSomethingElse();
         
@@ -61,7 +61,7 @@ internal static void Main()
         MyBusiness myBusiness = new();
         try
         {
-            myBusiness.DoSomething();
+            myBusiness.DoSomeWork();
             
             DoSomethingElse();
         }

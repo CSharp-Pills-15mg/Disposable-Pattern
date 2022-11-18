@@ -2,9 +2,9 @@
 
 Until now we discussed about classes that contain unmanaged memory and how to ensure that the memory is released.
 
-But what if out class contains fields that implement the `IDisposable` interface? Should we do something special about them? Should we call their `Dispose()` method? If yes, when?
+But what if out class contains members that implement the `IDisposable` interface? Should we do something special about them? Should we call their `Dispose()` method? If yes, when?
 
-In this session we will discuss about disposable member, but first, let's remember how our class looks like.
+In this session we will discuss about disposable members, but first, let's remember how our class looks like.
 
 ## From the previous session
 
@@ -60,7 +60,6 @@ internal static void Main()
     while (true)
     {
         using MyBusiness myBusiness = new();
-        
         myBusiness.DoSomeWork();
         
         DoSomethingElse();
@@ -77,7 +76,7 @@ internal static DoSometingElse()
 
 ## Adding a `FileStream` field
 
-Let's assum that our class need to open a file to write some data into it. It will have a field of type `FileStream` that will be initialized on the constructor like this:
+Let's assume that our class need to open a file to write some data into it. It will have a field of type `FileStream` that will be initialized in the constructor and used in another methods like this:
 
 ```csharp
 internal class MyBusiness : IDisposable
@@ -89,23 +88,10 @@ internal class MyBusiness : IDisposable
     public MyBusiness()
     {
         IntPtr pointer = Marshal.AllocHGlobal(1024);
+        
+        // Create the file stream in the constructor.
         fileStream = File.OpenWrite("c:\\temp\\file.txt");
     }
-    
-    ...
-}
-```
-
-and, later, used in some other methods:
-
-```csharp
-internal class MyBusiness : IDisposable
-{
-    ...
-        
-    private FileStream fileStream;
-    
-    ...
     
     public void DoSomeWork()
     {
@@ -164,13 +150,13 @@ The `DisposeInternal()` method is executed in two different contexts:
 - When manually executed by calling the `Dispose()` method (either explicitly or implicitly from the `using` statement), everything goes as planned;
 - But, when it is executed by the finalizer, we may have a problem. 
 
-## Issue 5 - Disposing other objects dusing finalization
+## Issue 5 - Disposing other objects during finalization
 
-When our object is disposed during the finalization phase, we know the object is not referenced by the main part of the application and the Garbage Colletor is trying to destroy it. The `fileStream` field is in the same situation, the Garbage Collector will try to destroy it, but we do not know if the `fileStream` was already destroyed or not. So, we should let Garbage Collector to do its job and not try to dispose the `fileStream` ourselves:
+When our object is disposed during the finalization phase, we know the object is not referenced by the main part of the application and the Garbage Collector is trying to destroy it. The `fileStream` field is in the same situation, the Garbage Collector will try to destroy it, but we do not know if the `fileStream` was already destroyed or not. So, we should let Garbage Collector to do its job and not try to dispose the `fileStream` ourselves:
 
 ### Solution for Issue 5
 
-To fix this problem, in the `DisposeInternal()` method we need a way to dispose the dispoable fields only if the `Dispose()` was called directly and not from the finalizer.
+To fix this problem, in the `DisposeInternal()` method we need a way to dispose the disposable fields only if the `Dispose()` was called directly and not from the finalizer.
 
 We may add a boolean parameter for that:
 
@@ -213,7 +199,7 @@ internal class MyBusiness : IDisposable
 
 ## Rename the private `Dispose(bool)`
 
-By convention, the private method that we called until now `DisposeInternal(bool)`  is usually called `Dispose(bool)`. We could not named it from the beginning `Dispose()` because it would have had the same signature with the public `Dispose()` method. But now, when we added the boolean parameter, it is not the case anymore.
+By convention, the private method that we called until now `DisposeInternal(bool)`  is usually called `Dispose(bool)`. We could not name it from the beginning `Dispose()` because it would have had the same signature with the public `Dispose()` method. But now, when we added the boolean parameter, we are free to name it as we wish.
 
 Let's rename it:
 
@@ -256,9 +242,11 @@ internal class MyBusiness : IDisposable
 
 ## Conclusions
 
-I think we are good for now. We took care of the disposable members to call their `Dispose()` methods, too. But not when the main object is disposed during the finalization.
+I think we are good for now. We took care of the disposable members and called their `Dispose()` methods, too. And this is done only when manually disposing the object, not when it is disposed during the finalization.
 
-The last topic to discuss is "Derived Classes". How can we allow other derived classes to dispose their own unmanaged memory during the dispose process?
+The last topic to discuss is "Derived Classes":
+
+- How can we allow other derived classes to dispose their own unmanaged memory during the dispose process?
 
 
 

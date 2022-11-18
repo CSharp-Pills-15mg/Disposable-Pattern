@@ -79,7 +79,6 @@ internal static void Main()
     while (true)
     {
         using MyBusiness myBusiness = new();
-        
         myBusiness.DoSomeWork();
         
         DoSomethingElse();
@@ -149,7 +148,6 @@ internal static void Main()
     while (true)
     {
         using OtherBusiness otherBusiness = new();
-        
         otherBusiness.DoSomeWork();
         otherBusiness.DoSomOtherWork();
         

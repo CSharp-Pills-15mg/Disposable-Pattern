@@ -74,7 +74,7 @@ internal static void Main()
     while (true)
     {
         MyBusiness myBusiness = new();
-        myBusiness.DoSomething();
+        myBusiness.DoSomeWork();
         myBusiness.Close();
     }
 }
@@ -99,7 +99,7 @@ internal static void Main()
     while (true)
     {
         MyBusiness myBusiness = new();
-        myBusiness.DoSomething();
+        myBusiness.DoSomeWork();
         
         DoSomethingElse();
         

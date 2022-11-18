@@ -146,7 +146,6 @@ internal static void Main()
     while (true)
     {
         using MyBusiness myBusiness = new();
-        
         myBusiness.DoSomeWork();
         
         DoSomethingElse();

@@ -5,7 +5,7 @@
 In the previous session we identified two more issues:
 
 - **Issue 3 - The finalizer is unnecessary executed**
-  - After the `Dispose()` is manually executed, the finalizer can be ignored, but it will still be executed by the Garbage Collector, delaying the destruction of the object.
+  - After the `Dispose()` is manually executed, the finalizer brings no additional value, but it will still be executed by the Garbage Collector, delaying the destruction of the object.
 
 
 - **Issue 4 - The finalizer will throw an exception**
@@ -15,7 +15,7 @@ In this session will provide a solution for these new issues. But first, let's r
 
 ### The unsafe class
 
-It provides a finalizer:
+It implements the `IDisposable` interface and, in addition provides a finalizer that calls the `Dispose()` method:
 
 ```csharp
 internal class MyBusiness : IDisposable
@@ -60,7 +60,6 @@ internal static void Main()
     while (true)
     {
         using MyBusiness myBusiness = new();
-        
         myBusiness.DoSomeWork();
         
         DoSomethingElse();
@@ -81,7 +80,7 @@ If the consumer already manually executed the `Dispose()` method, the execution 
 
 This method must be executed when the `Dispose()` is manually called and not when the `Dispose()` is called from the finalizer. To be able to do the difference, let's, first, extract the content of the `Dispose()` in a private method that will be executed from both the public `Dispose` and the finalizer.
 
-Then, we can call `GC.SuppressFinalize(this)` from the public `Dispose()` method.
+Then, we can call `GC.SuppressFinalize(this)` only from the public `Dispose()` method.
 
 The final code looks like this:
 
@@ -115,25 +114,25 @@ internal class MyBusiness : IDisposable
 
 > **Note**
 >
-> In the final state of the implementation, by convention, the `DisposeInternal()` method is, actually, renamed to `Dispose(bool)`.
+> In the final state of the implementation, by convention, the `DisposeInternal()` method will be, actually, renamed to `Dispose(bool)`.
 >
 > This will be done later, when the boolean parameter will also be added.
 
 The current implementation is, actually, fixing both issues (Issue 3 and Issue 4):
 
 - The finalizer will not be called unnecessary.
-- The finalizer will not throw because it will not be called after the memory is released from the first call.
+- The finalizer will not throw because it will not be called a second time, after the memory is released from the first call.
 
 ## Conclusions
 
-Now the calss is safe to be used. Isn't it? We took care of releasing the unmanaged memory even if the consumer forgets to manually do it.
+Now the class is safe to be used. Isn't it? We took care of releasing the unmanaged memory even if the consumer forgets to manually do it.
 
 Is this all?
 
-Actually... There are things that can be improved. We did not discussed about:
+Actually... There are things that can be improved. We did not discussed yet about:
 
 - How to prevent the usage of the object after it was disposed?
-- What about the inheritors of the class? How should they release their unmanaged memory if needed?
-- And, also, how to handle a disposable field if it is part of our disposable class? Is there any change in the implementation to handle this case?
+- What about the potential derived classes? How should they release their unmanaged memory if needed?
+- And, also, how to handle a disposable instance of another type if it is part of our disposable class? Is there any change in the implementation to handle this case?
 
 Let's take them one by one.
