@@ -12,7 +12,7 @@
 - Let's create a class containing unmanaged resources (manually allocated memory).
 - How to ensure the memory is released when it is no longer needed?
 
-**03 - Safely Use the Unsafe Class**
+**03 - How to Safely Use the Unsafe Class?**
 
 - How the consumer of our class should use it?
 - But is it safe to rely only on the consumer's skills and knowledge?
